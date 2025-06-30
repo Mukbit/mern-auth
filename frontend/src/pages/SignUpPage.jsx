@@ -20,6 +20,7 @@ const SignUpPage = () => {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+    console.log("handleSignUp called with:", { name, email, password, recaptchaToken });
 
     // Client-side validation
     if (!name.trim() || !email.trim() || !password.trim()) {
@@ -35,13 +36,12 @@ const SignUpPage = () => {
     try {
       await signup(email, password, name, recaptchaToken);
       navigate("/verify-email");
-      // Reset reCAPTCHA after successful submission
       recaptchaRef.current.reset();
       setRecaptchaToken(null);
+      toast.success("Signup successful! Please verify your email.");
     } catch (error) {
       console.log("Signup Error:", error);
-      toast.error(error.response?.data?.message || "Error signing up");
-      // Reset reCAPTCHA on error (e.g., token expiry or invalid)
+      toast.error(error.response?.data?.message || error.message || "An unexpected error occurred");
       recaptchaRef.current.reset();
       setRecaptchaToken(null);
     }
@@ -53,6 +53,7 @@ const SignUpPage = () => {
 
   const handleRecaptchaChange = (token) => {
     setRecaptchaToken(token);
+    console.log("reCAPTCHA token received:", token);
   };
 
   return (
@@ -101,11 +102,13 @@ const SignUpPage = () => {
           {error && <p className="text-red-500 font-semibold mt-2">{error}</p>}
           <PasswordStrengthMeter password={password} />
 
-          {/* ReCAPTCHA aligned with form fields */}
           <div className="mt-4 w-full">
             <ReCAPTCHA
               ref={recaptchaRef}
-              sitekey="6Lf-XHErAAAAACUiFBMceUOqwFTJYMhxPUEIIuQm"
+              sitekey={
+                process.env.REACT_APP_RECAPTCHA_SITE_KEY ||
+                "6LckJ3IrAAAAAKKRfNDW9KQB2Z8sLISvcOy8tz1_"
+              }
               onChange={handleRecaptchaChange}
               className="w-full flex justify-center"
             />

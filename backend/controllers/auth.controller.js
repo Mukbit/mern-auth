@@ -15,7 +15,7 @@ export const signup = async (req, res) => {
             null,
             {
                 params: {
-                    secret: process.env.RECAPTCHA_SECRET_KEY,
+                    secret: process.env.RECAPTCHA_SECRET_KEYD,
                     response: recaptchaToken,
                 },
             }
